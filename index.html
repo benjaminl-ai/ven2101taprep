@@ -3,107 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rika Review Helper</title>
+    <title>Rika Toaster Review Helper</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #e67e22; --success: #27ae60; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', Helvetica, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
-        .container { max-width: 100%; }
-        h2 { color: var(--primary); text-align: center; font-size: 1.4rem; }
+        :root { --primary: #2c3e50; --accent: #e67e22; --success: #27ae60; --bg: #f0f2f5; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 100%; margin-bottom: 50px; }
+        h2 { color: var(--primary); text-align: center; font-size: 1.2rem; margin-top: 10px; }
         
         /* Tab Navigation */
-        .nav-scroll { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
-        .nav-btn { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; white-space: nowrap; font-size: 0.9rem; flex-shrink: 0; }
+        .nav-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid #ddd; }
+        .nav-btn { background: white; border: 1px solid #ccc; padding: 6px 12px; border-radius: 15px; white-space: nowrap; font-size: 0.85rem; flex-shrink: 0; outline: none; }
         .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* Card Design */
-        .section-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
-        .section-card.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* UI Elements */
-        .hint-box { background: #eef2f7; padding: 10px; border-left: 4px solid var(--accent); margin-bottom: 15px; font-size: 0.85rem; border-radius: 4px; }
-        textarea { width: 100%; height: 80px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; }
+        /* Card & Box Design */
+        .section-card { display: none; animation: fadeIn 0.3s ease; }
+        .section-card.active { display: block; }
+        .sub-box { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        h4 { margin: 0 0 8px 0; font-size: 0.9rem; color: var(--accent); text-transform: uppercase; }
         
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button.action { padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-listen { background: #ebf5ff; color: #007bff; }
-        .btn-record { background: #fff0e6; color: #e67e22; }
-        .recording { background: #ff4d4d !important; color: white !important; animation: pulse 1.5s infinite; }
+        .hint { font-size: 0.8rem; color: #666; margin-bottom: 8px; line-height: 1.3; }
+        .suggestion-list { background: #fff9f0; padding: 10px; border-radius: 6px; font-size: 0.8rem; border-left: 3px solid #f39c12; margin: 10px 0; }
         
+        textarea { width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 6px; padding: 8px; box-sizing: border-box; font-size: 0.95rem; background: #fafafa; }
+        
+        /* Buttons */
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        button { padding: 10px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+        .btn-listen { background: #e3f2fd; color: #1976d2; }
+        .btn-record { background: #fbe9e7; color: #d84315; }
+        .recording { background: #ff5252 !important; color: white !important; animation: pulse 1s infinite; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-        /* Grid for 6 Boxes */
-        .feature-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .feature-box { border: 1px dashed #bbb; padding: 10px; border-radius: 8px; }
-        .feature-label { font-weight: bold; font-size: 0.8rem; color: #666; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🍞 Rika Toaster Trainer</h2>
+    <h2>🍞 Rika Toaster Review Script Helper</h2>
     
     <div class="nav-scroll" id="navBar">
-        <button class="nav-btn active" onclick="showSec(0)">Opening</button>
-        <button class="nav-btn" onclick="showSec(1)">Features</button>
-        <button class="nav-btn" onclick="showSec(2)">Instructions</button>
-        <button class="nav-btn" onclick="showSec(3)">Review</button>
-        <button class="nav-btn" onclick="showSec(4)">CTA</button>
+        <button class="nav-btn active" onclick="showSec(0)">1. Opening</button>
+        <button class="nav-btn" onclick="showSec(1)">2. Features</button>
+        <button class="nav-btn" onclick="showSec(2)">3. Instructions</button>
+        <button class="nav-btn" onclick="showSec(3)">4. Review</button>
+        <button class="nav-btn" onclick="showSec(4)">5. Call to Action</button>
     </div>
 
     <div id="sec0" class="section-card active">
-        <h3>Step 1: Opening</h3>
-        <div class="hint-box"><b>Greeting:</b> Hi, everyone! Welcome back...<br><b>Self-intro:</b> I'm [Name]...<br><b>Purpose:</b> Today, I'm going to review...</div>
-        <textarea id="txt0" placeholder="Combine Greeting, Self-intro, and Purpose..."></textarea>
-        <div class="btn-group">
-            <button class="action btn-listen" onclick="speak('txt0')">🔊 Listen</button>
-            <button class="action btn-record" id="recBtn0" onclick="record('txt0', 'recBtn0')">🎤 Record</button>
+        <div class="sub-box">
+            <h4>1.1 Greeting</h4>
+            <p class="hint">e.g., Hi, all! Welcome back to my channel!</p>
+            <textarea id="o1" placeholder="Type your greeting..."></textarea>
+            <div class="btn-row">
+                <button class="btn-listen" onclick="speak('o1')">🔊 Listen</button>
+                <button class="btn-record" id="ro1" onclick="record('o1', 'ro1')">🎤 Practice</button>
+            </div>
+        </div>
+        <div class="sub-box">
+            <h4>1.2 Self-Introduction</h4>
+            <p class="hint">e.g., This is [Your Name] again.</p>
+            <textarea id="o2" placeholder="Type your intro..."></textarea>
+            <div class="btn-row">
+                <button class="btn-listen" onclick="speak('o2')">🔊 Listen</button>
+                <button class="btn-record" id="ro2" onclick="record('o2', 'ro2')">🎤 Practice</button>
+            </div>
+        </div>
+        <div class="sub-box">
+            <h4>1.3 Purpose</h4>
+            <p class="hint">e.g., Today, I’m going to review the new Rika Toaster.</p>
+            <textarea id="o3" placeholder="Type your purpose..."></textarea>
+            <div class="btn-row">
+                <button class="btn-listen" onclick="speak('o3')">🔊 Listen</button>
+                <button class="btn-record" id="ro3" onclick="record('o3', 'ro3')">🎤 Practice</button>
+            </div>
         </div>
     </div>
 
     <div id="sec1" class="section-card">
-        <h3>Step 2: Features (6 Boxes)</h3>
-        <div class="feature-grid">
-            <div class="feature-box">
-                <span class="feature-label">Powerful</span>
-                <textarea id="f1" placeholder="It is powerful..."></textarea>
-                <button class="action btn-record" id="rf1" onclick="record('f1', 'rf1')">🎤 Practice</button>
-            </div>
-            <div class="feature-box">
-                <span class="feature-label">Energy Saving</span>
-                <textarea id="f2" placeholder="It is energy saving..."></textarea>
-                <button class="action btn-record" id="rf2" onclick="record('f2', 'rf2')">🎤 Practice</button>
-            </div>
-            </div>
+        <div class="sub-box"><h4>Powerful</h4><p class="hint">It is / has / can...</p><textarea id="f1"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f1')">🔊</button><button class="btn-record" id="rf1" onclick="record('f1', 'rf1')">🎤</button></div></div>
+        <div class="sub-box"><h4>Energy Saving</h4><p class="hint">It is / has / can...</p><textarea id="f2"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f2')">🔊</button><button class="btn-record" id="rf2" onclick="record('f2', 'rf2')">🎤</button></div></div>
+        <div class="sub-box"><h4>Browning Control</h4><p class="hint">It is / has / can...</p><textarea id="f3"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f3')">🔊</button><button class="btn-record" id="rf3" onclick="record('f3', 'rf3')">🎤</button></div></div>
+        <div class="sub-box"><h4>Automatic Shut-off</h4><p class="hint">It is / has / can...</p><textarea id="f4"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f4')">🔊</button><button class="btn-record" id="rf4" onclick="record('f4', 'rf4')">🎤</button></div></div>
+        <div class="sub-box"><h4>Toast Evenly</h4><p class="hint">It is / has / can...</p><textarea id="f5"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f5')">🔊</button><button class="btn-record" id="rf5" onclick="record('f5', 'rf5')">🎤</button></div></div>
+        <div class="sub-box"><h4>Remove Crumbs Easily</h4><p class="hint">It is / has / can...</p><textarea id="f6"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f6')">🔊</button><button class="btn-record" id="rf6" onclick="record('f6', 'rf6')">🎤</button></div></div>
     </div>
 
     <div id="sec2" class="section-card">
-        <h3>Step 3: Instructions</h3>
-        <div class="hint-box">How to start? 1. Put bread in <b>slots</b>. 2. Push <b>lever</b> -> Toasts.</div>
-        <textarea id="txt2" placeholder="Describe the steps..."></textarea>
-        <div class="btn-group">
-            <button class="action btn-listen" onclick="speak('txt2')">🔊 Listen</button>
-            <button class="action btn-record" id="recBtn2" onclick="record('txt2', 'recBtn2')">🎤 Record</button>
+        <div class="sub-box">
+            <h4>Ex 1: Standard Toasting</h4>
+            <p class="hint">Task: How to toast a slice of bread? (Use <b>slot</b> and <b>lever</b>)</p>
+            <textarea id="i1" placeholder="1. ... 2. ... -> ..."></textarea>
+            <div class="btn-row"><button class="btn-listen" onclick="speak('i1')">🔊 Listen</button><button class="btn-record" id="ri1" onclick="record('i1', 'ri1')">🎤 Practice</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>Ex 2: Stop / Cancel</h4>
+            <p class="hint">Task: How to stop the toaster early? (Use <b>lever</b>)</p>
+            <textarea id="i2" placeholder="1. ... 2. ... -> ..."></textarea>
+            <div class="btn-row"><button class="btn-listen" onclick="speak('i2')">🔊 Listen</button><button class="btn-record" id="ri2" onclick="record('i2', 'ri2')">🎤 Practice</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>Ex 3: Cleaning</h4>
+            <p class="hint">Task: How to clean the crumbs? (Mention <b>slot</b>)</p>
+            <textarea id="i3" placeholder="1. ... 2. ... -> ..."></textarea>
+            <div class="btn-row"><button class="btn-listen" onclick="speak('i3')">🔊 Listen</button><button class="btn-record" id="ri3" onclick="record('i3', 'ri3')">🎤 Practice</button></div>
         </div>
     </div>
 
     <div id="sec3" class="section-card">
-        <h3>Step 4: Review (Don't Like -> Like)</h3>
-        <div class="hint-box"><b>Tip:</b> Start with "One minor issue is..." then "However, I love..."</div>
-        <textarea id="txt3" placeholder="Write your balanced review..."></textarea>
-        <div class="btn-group">
-            <button class="action btn-listen" onclick="speak('txt3')">🔊 Listen</button>
-            <button class="action btn-record" id="recBtn3" onclick="record('txt3', 'recBtn3')">🎤 Record</button>
+        <div class="sub-box">
+            <h4>Your Final Review</h4>
+            <div class="suggestion-list">
+                <b>Suggestions:</b><br>
+                ❌ Don't like: takes up space, short cord, gets hot.<br>
+                ✅ Like: beautiful design, very fast, safe to use.
+            </div>
+            <p class="hint">Format: To me, this toaster is [Like]. But it is [Don't like].</p>
+            <textarea id="rv1" placeholder="To me, this toaster is... But it is..."></textarea>
+            <div class="btn-row">
+                <button class="btn-listen" onclick="speak('rv1')">🔊 Listen</button>
+                <button class="btn-record" id="rrv1" onclick="record('rv1', 'rrv1')">🎤 Practice</button>
+            </div>
         </div>
     </div>
 
     <div id="sec4" class="section-card">
-        <h3>Step 5: Call to Action</h3>
-        <div class="hint-box">1. HOMEFOX (20% off)<br>2. Festive Sale (15 June)<br>3. Online Free Giveaway</div>
-        <textarea id="txt4" placeholder="Pick one and write..."></textarea>
-        <div class="btn-group">
-            <button class="action btn-listen" onclick="speak('txt4')">🔊 Listen</button>
-            <button class="action btn-record" id="recBtn4" onclick="record('txt4', 'recBtn4')">🎤 Record</button>
+        <div class="sub-box">
+            <h4>Option 1: Discount Code</h4>
+            <p class="hint">Topic: Use promo/discount code HOMEFOX, get 20% off</p>
+            <textarea id="c1" placeholder="e.g. If you want to save money, use the promo code HOMEFOX at checkout to get 20% off your total order!"></textarea>
+            <div class="btn-row"><button class="btn-listen" onclick="speak('c1')">🔊 Listen</button><button class="btn-record" id="rc1" onclick="record('c1', 'rc1')">🎤 Practice</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>Option 2: Seasonal Sale</h4>
+            <p class="hint">Topic: Festive sale deadline 15 June, up to 50% off</p>
+            <textarea id="c2" placeholder="e.g. Don't wait! The festive sale ends on 15 June. You can get a massive discount of up to 50% off if you act now!"></textarea>
+            <div class="btn-row"><button class="btn-listen" onclick="speak('c2')">🔊 Listen</button><button class="btn-record" id="rc2" onclick="record('c2', 'rc2')">🎤 Practice</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>Option 3: Online Bonus</h4>
+            <p class="hint">Topic: Order it online, free giveaway</p>
+            <textarea id="c3" placeholder="e.g. Order your Rika toaster online today through our website and you will receive an exclusive free giveaway with your delivery!"></textarea>
+            <div class="btn-row"><button class="btn-listen" onclick="speak('c3')">🔊 Listen</button><button class="btn-record" id="rc3" onclick="record('c3', 'rc3')">🎤 Practice</button></div>
         </div>
     </div>
 </div>
@@ -114,10 +155,12 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('sec' + idx).classList.add('active');
         document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+        window.scrollTo(0,0);
     }
 
     function speak(id) {
         const text = document.getElementById(id).value;
+        if(!text) return alert("Please type your script first.");
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'en-US';
         window.speechSynthesis.speak(msg);
@@ -128,7 +171,6 @@
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'en-US';
         
-        // UI Change: Start Recording
         btn.classList.add('recording');
         btn.innerText = "🛑 Recording...";
         
@@ -137,18 +179,18 @@
         recognition.onresult = function(event) {
             const result = event.results[0][0].transcript;
             alert("Feedback: \nYou said: " + result);
-            stopRec(btn);
         };
 
-        recognition.onerror = function() { stopRec(btn); };
-        recognition.onend = function() { stopRec(btn); }; // Disable Mic Access by ending session
-    }
-
-    function stopRec(btn) {
-        btn.classList.remove('recording');
-        btn.innerText = "🎤 Practice";
+        recognition.onend = function() {
+            btn.classList.remove('recording');
+            btn.innerText = "🎤 Practice";
+        };
+        
+        recognition.onerror = function() {
+            btn.classList.remove('recording');
+            btn.innerText = "🎤 Practice";
+        };
     }
 </script>
-
 </body>
 </html>

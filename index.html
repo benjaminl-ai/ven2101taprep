@@ -2,122 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rika Toaster Review Helper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rika Review Helper</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background: #f4f7f6; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .tab-content { display: none; }
-        .active { display: block; }
-        textarea { width: 100%; height: 100px; margin: 15px 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; transition: 0.3s; }
-        .btn-listen { background: #3498db; color: white; }
-        .btn-record { background: #e67e22; color: white; }
-        .btn-next { background: #2ecc71; color: white; float: right; }
-        .hint { font-size: 0.9em; color: #666; font-style: italic; }
-        nav { margin-bottom: 20px; }
-        nav button { background: #ddd; margin-right: 5px; }
-        nav button.active-nav { background: #2c3e50; color: white; }
+        :root { --primary: #2c3e50; --accent: #e67e22; --success: #27ae60; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Helvetica, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 100%; }
+        h2 { color: var(--primary); text-align: center; font-size: 1.4rem; }
+        
+        /* Tab Navigation */
+        .nav-scroll { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .nav-btn { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; white-space: nowrap; font-size: 0.9rem; flex-shrink: 0; }
+        .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Card Design */
+        .section-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
+        .section-card.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* UI Elements */
+        .hint-box { background: #eef2f7; padding: 10px; border-left: 4px solid var(--accent); margin-bottom: 15px; font-size: 0.85rem; border-radius: 4px; }
+        textarea { width: 100%; height: 80px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button.action { padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-listen { background: #ebf5ff; color: #007bff; }
+        .btn-record { background: #fff0e6; color: #e67e22; }
+        .recording { background: #ff4d4d !important; color: white !important; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* Grid for 6 Boxes */
+        .feature-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .feature-box { border: 1px dashed #bbb; padding: 10px; border-radius: 8px; }
+        .feature-label { font-weight: bold; font-size: 0.8rem; color: #666; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>🍞 Rika Toaster Review Helper</h2>
-    <nav id="nav-tabs"></nav>
-
-    <div id="steps-container">
-        <div class="tab-content active" id="step0">
-            <h3>Step 1: Opening</h3>
-            <p class="hint">Hi, all! Welcome back to my channel! This is [Name] again. Today, I’m going to review the new Rika Toaster.</p>
-            <textarea id="text0" placeholder="Type your opening here..."></textarea>
-            <div class="btn-group">
-                <button class="btn-listen" onclick="speak('text0')">🔊 Listen</button>
-                <button class="btn-record" onclick="record('text0')">🎤 Practice</button>
-            </div>
-        </div>
-
-        <div class="tab-content" id="step1">
-            <h3>Step 2: Product Features</h3>
-            <p class="hint">Key words: stainless steel, independent slots, crumb tray...</p>
-            <textarea id="text1" placeholder="It is / It has / It can..."></textarea>
-            <div class="btn-group">
-                <button class="btn-listen" onclick="speak('text1')">🔊 Listen</button>
-                <button class="btn-record" onclick="record('text1')">🎤 Practice</button>
-            </div>
-        </div>
-
-        </div>
+<div class="container">
+    <h2>🍞 Rika Toaster Trainer</h2>
     
-    <button class="btn-next" onclick="nextStep()">Next Step →</button>
+    <div class="nav-scroll" id="navBar">
+        <button class="nav-btn active" onclick="showSec(0)">Opening</button>
+        <button class="nav-btn" onclick="showSec(1)">Features</button>
+        <button class="nav-btn" onclick="showSec(2)">Instructions</button>
+        <button class="nav-btn" onclick="showSec(3)">Review</button>
+        <button class="nav-btn" onclick="showSec(4)">CTA</button>
+    </div>
+
+    <div id="sec0" class="section-card active">
+        <h3>Step 1: Opening</h3>
+        <div class="hint-box"><b>Greeting:</b> Hi, everyone! Welcome back...<br><b>Self-intro:</b> I'm [Name]...<br><b>Purpose:</b> Today, I'm going to review...</div>
+        <textarea id="txt0" placeholder="Combine Greeting, Self-intro, and Purpose..."></textarea>
+        <div class="btn-group">
+            <button class="action btn-listen" onclick="speak('txt0')">🔊 Listen</button>
+            <button class="action btn-record" id="recBtn0" onclick="record('txt0', 'recBtn0')">🎤 Record</button>
+        </div>
+    </div>
+
+    <div id="sec1" class="section-card">
+        <h3>Step 2: Features (6 Boxes)</h3>
+        <div class="feature-grid">
+            <div class="feature-box">
+                <span class="feature-label">Powerful</span>
+                <textarea id="f1" placeholder="It is powerful..."></textarea>
+                <button class="action btn-record" id="rf1" onclick="record('f1', 'rf1')">🎤 Practice</button>
+            </div>
+            <div class="feature-box">
+                <span class="feature-label">Energy Saving</span>
+                <textarea id="f2" placeholder="It is energy saving..."></textarea>
+                <button class="action btn-record" id="rf2" onclick="record('f2', 'rf2')">🎤 Practice</button>
+            </div>
+            </div>
+    </div>
+
+    <div id="sec2" class="section-card">
+        <h3>Step 3: Instructions</h3>
+        <div class="hint-box">How to start? 1. Put bread in <b>slots</b>. 2. Push <b>lever</b> -> Toasts.</div>
+        <textarea id="txt2" placeholder="Describe the steps..."></textarea>
+        <div class="btn-group">
+            <button class="action btn-listen" onclick="speak('txt2')">🔊 Listen</button>
+            <button class="action btn-record" id="recBtn2" onclick="record('txt2', 'recBtn2')">🎤 Record</button>
+        </div>
+    </div>
+
+    <div id="sec3" class="section-card">
+        <h3>Step 4: Review (Don't Like -> Like)</h3>
+        <div class="hint-box"><b>Tip:</b> Start with "One minor issue is..." then "However, I love..."</div>
+        <textarea id="txt3" placeholder="Write your balanced review..."></textarea>
+        <div class="btn-group">
+            <button class="action btn-listen" onclick="speak('txt3')">🔊 Listen</button>
+            <button class="action btn-record" id="recBtn3" onclick="record('txt3', 'recBtn3')">🎤 Record</button>
+        </div>
+    </div>
+
+    <div id="sec4" class="section-card">
+        <h3>Step 5: Call to Action</h3>
+        <div class="hint-box">1. HOMEFOX (20% off)<br>2. Festive Sale (15 June)<br>3. Online Free Giveaway</div>
+        <textarea id="txt4" placeholder="Pick one and write..."></textarea>
+        <div class="btn-group">
+            <button class="action btn-listen" onclick="speak('txt4')">🔊 Listen</button>
+            <button class="action btn-record" id="recBtn4" onclick="record('txt4', 'recBtn4')">🎤 Record</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    let currentStep = 0;
-    const totalSteps = 5; // 對應你 template 的 5 個 section
-    const stepNames = ["Opening", "Features", "Instruction", "Review", "Closing"];
-
-    // 初始化 Navigation
-    const nav = document.getElementById('nav-tabs');
-    stepNames.forEach((name, i) => {
-        const btn = document.createElement('button');
-        btn.innerText = name;
-        btn.id = `nav${i}`;
-        if(i===0) btn.className = 'active-nav';
-        nav.appendChild(btn);
-    });
-
-    function nextStep() {
-        if (currentStep < stepNames.length - 1) {
-            document.getElementById(`step${currentStep}`).classList.remove('active');
-            document.getElementById(`nav${currentStep}`).classList.remove('active-nav');
-            currentStep++;
-            // 這裡動態生成新 Step 的內容 (為了簡化代碼，實際應用可預先寫好所有 div)
-            showStep(currentStep);
-        } else {
-            alert("Congratulations! You've finished your script!");
-        }
-    }
-
-    function showStep(step) {
-        // 隱藏所有
-        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-        // 顯示當前 (實際應用需確保 HTML 內有對應 ID)
-        let target = document.getElementById(`step${step}`);
-        if(!target) {
-            // 如果未預寫，這裡可動態生成或顯示隱藏好的 div
-            alert("Please complete the previous steps!");
-        } else {
-            target.style.display = 'block';
-            document.getElementById(`nav${step}`).className = 'active-nav';
-        }
+    function showSec(idx) {
+        document.querySelectorAll('.section-card').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('sec' + idx).classList.add('active');
+        document.querySelectorAll('.nav-btn')[idx].classList.add('active');
     }
 
     function speak(id) {
         const text = document.getElementById(id).value;
-        if(!text) return alert("Please write something first!");
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'en-US';
         window.speechSynthesis.speak(msg);
     }
 
-    function record(id) {
+    function record(id, btnId) {
+        const btn = document.getElementById(btnId);
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'en-US';
+        
+        // UI Change: Start Recording
+        btn.classList.add('recording');
+        btn.innerText = "🛑 Recording...";
+        
         recognition.start();
 
         recognition.onresult = function(event) {
             const result = event.results[0][0].transcript;
-            const original = document.getElementById(id).value;
-            
-            // 彈出 Feedback Window
-            const feedback = result.toLowerCase() === original.toLowerCase().trim() 
-                ? "✅ Excellent! Match 100%" 
-                : "⚠️ Keep trying!\nYou said: " + result;
-            alert(feedback);
+            alert("Feedback: \nYou said: " + result);
+            stopRec(btn);
         };
+
+        recognition.onerror = function() { stopRec(btn); };
+        recognition.onend = function() { stopRec(btn); }; // Disable Mic Access by ending session
+    }
+
+    function stopRec(btn) {
+        btn.classList.remove('recording');
+        btn.innerText = "🎤 Practice";
     }
 </script>
+
 </body>
 </html>

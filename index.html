@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rika Toaster Review Helper</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tab-content { display: none; }
+        .active { display: block; }
+        textarea { width: 100%; height: 100px; margin: 15px 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; transition: 0.3s; }
+        .btn-listen { background: #3498db; color: white; }
+        .btn-record { background: #e67e22; color: white; }
+        .btn-next { background: #2ecc71; color: white; float: right; }
+        .hint { font-size: 0.9em; color: #666; font-style: italic; }
+        nav { margin-bottom: 20px; }
+        nav button { background: #ddd; margin-right: 5px; }
+        nav button.active-nav { background: #2c3e50; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🍞 Rika Toaster Review Helper</h2>
+    <nav id="nav-tabs"></nav>
+
+    <div id="steps-container">
+        <div class="tab-content active" id="step0">
+            <h3>Step 1: Opening</h3>
+            <p class="hint">Hi, all! Welcome back to my channel! This is [Name] again. Today, I’m going to review the new Rika Toaster.</p>
+            <textarea id="text0" placeholder="Type your opening here..."></textarea>
+            <div class="btn-group">
+                <button class="btn-listen" onclick="speak('text0')">🔊 Listen</button>
+                <button class="btn-record" onclick="record('text0')">🎤 Practice</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="step1">
+            <h3>Step 2: Product Features</h3>
+            <p class="hint">Key words: stainless steel, independent slots, crumb tray...</p>
+            <textarea id="text1" placeholder="It is / It has / It can..."></textarea>
+            <div class="btn-group">
+                <button class="btn-listen" onclick="speak('text1')">🔊 Listen</button>
+                <button class="btn-record" onclick="record('text1')">🎤 Practice</button>
+            </div>
+        </div>
+
+        </div>
+    
+    <button class="btn-next" onclick="nextStep()">Next Step →</button>
+</div>
+
+<script>
+    let currentStep = 0;
+    const totalSteps = 5; // 對應你 template 的 5 個 section
+    const stepNames = ["Opening", "Features", "Instruction", "Review", "Closing"];
+
+    // 初始化 Navigation
+    const nav = document.getElementById('nav-tabs');
+    stepNames.forEach((name, i) => {
+        const btn = document.createElement('button');
+        btn.innerText = name;
+        btn.id = `nav${i}`;
+        if(i===0) btn.className = 'active-nav';
+        nav.appendChild(btn);
+    });
+
+    function nextStep() {
+        if (currentStep < stepNames.length - 1) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`nav${currentStep}`).classList.remove('active-nav');
+            currentStep++;
+            // 這裡動態生成新 Step 的內容 (為了簡化代碼，實際應用可預先寫好所有 div)
+            showStep(currentStep);
+        } else {
+            alert("Congratulations! You've finished your script!");
+        }
+    }
+
+    function showStep(step) {
+        // 隱藏所有
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        // 顯示當前 (實際應用需確保 HTML 內有對應 ID)
+        let target = document.getElementById(`step${step}`);
+        if(!target) {
+            // 如果未預寫，這裡可動態生成或顯示隱藏好的 div
+            alert("Please complete the previous steps!");
+        } else {
+            target.style.display = 'block';
+            document.getElementById(`nav${step}`).className = 'active-nav';
+        }
+    }
+
+    function speak(id) {
+        const text = document.getElementById(id).value;
+        if(!text) return alert("Please write something first!");
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
+    }
+
+    function record(id) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            const result = event.results[0][0].transcript;
+            const original = document.getElementById(id).value;
+            
+            // 彈出 Feedback Window
+            const feedback = result.toLowerCase() === original.toLowerCase().trim() 
+                ? "✅ Excellent! Match 100%" 
+                : "⚠️ Keep trying!\nYou said: " + result;
+            alert(feedback);
+        };
+    }
+</script>
+</body>
+</html>

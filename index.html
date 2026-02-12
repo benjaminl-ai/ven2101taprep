@@ -76,8 +76,8 @@
         <div class="video-box">
             <h4>👤 Self-Introduction</h4>
             <div class="unified-expressions">
-                <span class="exp-item" onclick="cp('o2', this)">This is Mia again!</span>
-                <span class="exp-item" onclick="cp('o2', this)">I'm Mia!</span>
+                <span class="exp-item" onclick="cp('o2', this)">This is (name) again!</span>
+                <span class="exp-item" onclick="cp('o2', this)">I'm (name)!</span>
             </div>
             <textarea id="o2" placeholder="Write your sentence here..."></textarea>
             <div class="btn-row"><button class="action btn-listen" onclick="sp('o2')">🔊 Listen</button><button class="action btn-record" id="ro2" onclick="handleRecord('o2', 'ro2')">🎤 Record</button></div>
@@ -181,7 +181,8 @@
 <div id="modalOverlay"><div class="modal"><h3 id="mT">🌟 Perfect!</h3><p id="mM"></p><button class="modal-close" onclick="document.getElementById('modalOverlay').style.display='none'">Close / 關閉</button></div></div>
 
 <script>
-    let currentRecognition = null;
+    let currentRec = null;
+    let targetId = "";
 
     function showSec(idx) {
         document.querySelectorAll('.section-card').forEach(s => s.classList.remove('active'));
@@ -189,7 +190,7 @@
         document.getElementById('sec' + idx).classList.add('active');
         document.querySelectorAll('.nav-btn')[idx].classList.add('active');
         window.scrollTo(0,0);
-        if (currentRecognition) stopRecognition();
+        if (currentRec) stopRecognition();
     }
 
     function cp(id, el) { document.getElementById(id).value = el.innerText.replace("🎬 ", ""); }
@@ -201,66 +202,72 @@
         window.speechSynthesis.speak(m);
     }
 
-    const fbs = [
-        {e: "🌟 Superb! Your accent sounds like a professional YouTuber!", c: "🌟 太棒了！你的發音聽起來像專業的YouTuber！"},
-        {e: "🔥 On Fire! Your pronunciation is crystal clear.", c: "🔥 表現出色！你的發音非常清晰。"},
-        {e: "💎 Flawless! Rika Toaster would be proud of you!", c: "💎 完美無瑕！Rika Toaster 會為你感到驕傲！"}
-    ];
-
     function handleRecord(textareaId, btnId) {
         const btn = document.getElementById(btnId);
-        
-        // 如果已經在錄音中，就結束錄音
         if (btn.classList.contains('recording')) {
             stopRecognition();
             return;
         }
-
-        // 如果有其他正在運行的錄音，先關閉它
-        if (currentRecognition) stopRecognition();
-
-        startRecognition(textareaId, btnId);
+        if (currentRec) stopRecognition();
+        targetId = textareaId;
+        startRecognition(btnId);
     }
 
-    function startRecognition(id, btnId) {
+    function startRecognition(btnId) {
         const btn = document.getElementById(btnId);
         const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!Rec) return alert("Speech Recognition not supported.");
         
-        currentRecognition = new Rec();
-        currentRecognition.lang = 'en-US';
-        currentRecognition.continuous = true; // 允許長錄音
-        currentRecognition.interimResults = false;
+        currentRec = new Rec();
+        currentRec.lang = 'en-US';
+        currentRec.continuous = true;
+        currentRec.interimResults = false;
 
         btn.classList.add('recording');
         btn.innerHTML = "🛑 Finish / 完成";
         
-        currentRecognition.onresult = (e) => {
-            const res = e.results[e.results.length - 1][0].transcript;
-            showFeedback(res);
+        currentRec.onresult = (e) => {
+            const transcript = e.results[e.results.length - 1][0].transcript;
+            validateSpeech(transcript);
         };
 
-        currentRecognition.onerror = () => stopRecognition();
-        currentRecognition.onend = () => stopRecognition();
-
-        currentRecognition.start();
+        currentRec.onerror = () => stopRecognition();
+        currentRec.onend = () => stopRecognition();
+        currentRec.start();
     }
 
     function stopRecognition() {
-        if (currentRecognition) {
-            currentRecognition.stop();
-            currentRecognition = null;
-        }
+        if (currentRec) { currentRec.stop(); currentRec = null; }
         document.querySelectorAll('.btn-record').forEach(b => {
             b.classList.remove('recording');
             b.innerHTML = "🎤 Record";
         });
     }
 
-    function showFeedback(transcript) {
-        const f = fbs[Math.floor(Math.random() * fbs.length)];
-        document.getElementById('mT').innerText = f.e.split('!')[0] + "!";
-        document.getElementById('mM').innerHTML = `<b>${f.e}</b><br><small>${f.c}</small><br><br><span style="color:red">"Heard: ${transcript}"</span>`;
+    function validateSpeech(heard) {
+        const original = document.getElementById(targetId).value.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+        const spoken = heard.toLowerCase();
+        
+        // 簡單的比對邏輯：如果原句中的關鍵字有一半以上沒出現在錄音中，就當讀錯
+        const words = original.split(" ").filter(w => w.length > 2);
+        let matchCount = 0;
+        words.forEach(w => { if(spoken.includes(w)) matchCount++; });
+
+        const isGood = words.length === 0 || (matchCount / words.length) >= 0.5;
+
+        if (isGood) {
+            const fbs = [
+                {e: "🌟 Superb! Your accent sounds like a professional YouTuber!", c: "🌟 太棒了！你的發音聽起來像專業的YouTuber！"},
+                {e: "🔥 On Fire! Your pronunciation is crystal clear.", c: "🔥 表現出色！你的發音非常清晰。"},
+                {e: "💎 Flawless! Rika Toaster would be proud of you!", c: "💎 完美無瑕！Rika Toaster 會為你感到驕傲！"}
+            ];
+            const f = fbs[Math.floor(Math.random() * fbs.length)];
+            document.getElementById('mT').innerText = f.e.split('!')[0] + "!";
+            document.getElementById('mM').innerHTML = `<b>${f.e}</b><br><small>${f.c}</small><br><br><span style="color:green">"Heard: ${heard}"</span>`;
+        } else {
+            document.getElementById('mT').innerText = "⚠️ Oops!";
+            document.getElementById('mM').innerHTML = `<b style="color:red">You might have missed some words or mispronounced them.</b><br><small>你似乎漏讀了某些字或發音不準確，請再試一次！</small><br><br><span>"I heard: ${heard}"</span>`;
+        }
         document.getElementById('modalOverlay').style.display = 'flex';
     }
 </script>

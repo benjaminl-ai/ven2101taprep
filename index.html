@@ -3,148 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rika Toaster Review Helper</title>
+    <title>Rika Toaster Star Reviewer</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #e67e22; --success: #27ae60; --bg: #f0f2f5; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-        .container { max-width: 100%; margin-bottom: 50px; }
-        h2 { color: var(--primary); text-align: center; font-size: 1.2rem; margin-top: 10px; }
+        :root { --primary: #6c5ce7; --accent: #fd79a8; --success: #00b894; --warning: #f1c40f; --bg: #fdfbff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #2d3436; }
+        .container { max-width: 100%; margin-bottom: 80px; }
+        h2 { color: var(--primary); text-align: center; font-size: 1.5rem; margin: 15px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         
         /* Tab Navigation */
-        .nav-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid #ddd; }
-        .nav-btn { background: white; border: 1px solid #ccc; padding: 6px 12px; border-radius: 15px; white-space: nowrap; font-size: 0.85rem; flex-shrink: 0; outline: none; }
-        .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .nav-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 5px; position: sticky; top: 0; background: var(--bg); z-index: 100; scrollbar-width: none; }
+        .nav-btn { background: white; border: 2px solid var(--primary); padding: 8px 16px; border-radius: 25px; white-space: nowrap; font-size: 0.9rem; font-weight: bold; color: var(--primary); transition: 0.3s; }
+        .nav-btn.active { background: var(--primary); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
 
         /* Card & Box Design */
-        .section-card { display: none; animation: fadeIn 0.3s ease; }
+        .section-card { display: none; animation: slideUp 0.4s ease-out; }
         .section-card.active { display: block; }
-        .sub-box { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        h4 { margin: 0 0 8px 0; font-size: 0.9rem; color: var(--accent); text-transform: uppercase; }
+        .sub-box { background: white; padding: 18px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); border: 2px solid #f1f2f6; }
+        h4 { margin: 0 0 10px 0; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
         
-        .hint { font-size: 0.8rem; color: #666; margin-bottom: 8px; line-height: 1.3; }
-        .suggestion-list { background: #fff9f0; padding: 10px; border-radius: 6px; font-size: 0.8rem; border-left: 3px solid #f39c12; margin: 10px 0; }
+        .hint { font-size: 0.85rem; color: #636e72; margin-bottom: 12px; background: #f8f9fa; padding: 10px; border-radius: 10px; border-left: 4px solid var(--accent); }
+        .suggestion-list { background: #fff5f8; padding: 12px; border-radius: 12px; font-size: 0.85rem; border: 1px dashed var(--accent); margin: 10px 0; }
         
-        textarea { width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 6px; padding: 8px; box-sizing: border-box; font-size: 0.95rem; background: #fafafa; }
+        textarea { width: 100%; height: 75px; border: 2px solid #eee; border-radius: 12px; padding: 12px; box-sizing: border-box; font-size: 1rem; transition: 0.3s; outline: none; }
+        textarea:focus { border-color: var(--accent); background: #fff; }
         
         /* Buttons */
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        button { padding: 10px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
-        .btn-listen { background: #e3f2fd; color: #1976d2; }
-        .btn-record { background: #fbe9e7; color: #d84315; }
-        .recording { background: #ff5252 !important; color: white !important; animation: pulse 1s infinite; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        button.action { padding: 12px; border: none; border-radius: 12px; font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: 0.2s; active { transform: scale(0.95); } }
+        .btn-listen { background: #a29bfe; color: white; }
+        .btn-record { background: #fab1a0; color: white; }
+        .recording { background: #ff7675 !important; animation: pulse 1s infinite; }
         
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🍞 Rika Toaster Review Script Helper</h2>
+    <h2>✨ Rika Toaster Star Reviewer</h2>
     
-    <div class="nav-scroll" id="navBar">
-        <button class="nav-btn active" onclick="showSec(0)">1. Opening</button>
-        <button class="nav-btn" onclick="showSec(1)">2. Features</button>
-        <button class="nav-btn" onclick="showSec(2)">3. Instructions</button>
-        <button class="nav-btn" onclick="showSec(3)">4. Review</button>
-        <button class="nav-btn" onclick="showSec(4)">5. Call to Action</button>
+    <div class="nav-scroll">
+        <button class="nav-btn active" onclick="showSec(0)">Opening</button>
+        <button class="nav-btn" onclick="showSec(1)">Features</button>
+        <button class="nav-btn" onclick="showSec(2)">Instruction</button>
+        <button class="nav-btn" onclick="showSec(3)">Review</button>
+        <button class="nav-btn" onclick="showSec(4)">CTA</button>
+        <button class="nav-btn" onclick="showSec(5)">Closing</button>
     </div>
 
     <div id="sec0" class="section-card active">
         <div class="sub-box">
-            <h4>1.1 Greeting</h4>
-            <p class="hint">e.g., Hi, all! Welcome back to my channel!</p>
-            <textarea id="o1" placeholder="Type your greeting..."></textarea>
-            <div class="btn-row">
-                <button class="btn-listen" onclick="speak('o1')">🔊 Listen</button>
-                <button class="btn-record" id="ro1" onclick="record('o1', 'ro1')">🎤 Practice</button>
-            </div>
+            <h4>👋 Greeting</h4>
+            <p class="hint">Try: "Hi, all! Welcome back to my channel!"</p>
+            <textarea id="o1" placeholder="Start with a friendly hello..."></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('o1')">🔊 Listen</button><button class="action btn-record" id="ro1" onclick="record('o1', 'ro1')">🎤 Practice</button></div>
         </div>
         <div class="sub-box">
-            <h4>1.2 Self-Introduction</h4>
-            <p class="hint">e.g., This is [Your Name] again.</p>
-            <textarea id="o2" placeholder="Type your intro..."></textarea>
-            <div class="btn-row">
-                <button class="btn-listen" onclick="speak('o2')">🔊 Listen</button>
-                <button class="btn-record" id="ro2" onclick="record('o2', 'ro2')">🎤 Practice</button>
-            </div>
+            <h4>👤 Self-Introduction</h4>
+            <p class="hint">Try: "This is [Your Name] again."</p>
+            <textarea id="o2" placeholder="Tell them who you are..."></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('o2')">🔊 Listen</button><button class="action btn-record" id="ro2" onclick="record('o2', 'ro2')">🎤 Practice</button></div>
         </div>
         <div class="sub-box">
-            <h4>1.3 Purpose</h4>
-            <p class="hint">e.g., Today, I’m going to review the new Rika Toaster.</p>
-            <textarea id="o3" placeholder="Type your purpose..."></textarea>
-            <div class="btn-row">
-                <button class="btn-listen" onclick="speak('o3')">🔊 Listen</button>
-                <button class="btn-record" id="ro3" onclick="record('o3', 'ro3')">🎤 Practice</button>
-            </div>
+            <h4>🎯 Purpose</h4>
+            <p class="hint">Try: "Today, I’m going to review the new Rika Toaster."</p>
+            <textarea id="o3" placeholder="Why are we here today?"></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('o3')">🔊 Listen</button><button class="action btn-record" id="ro3" onclick="record('o3', 'ro3')">🎤 Practice</button></div>
         </div>
     </div>
 
     <div id="sec1" class="section-card">
-        <div class="sub-box"><h4>Powerful</h4><p class="hint">It is / has / can...</p><textarea id="f1"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f1')">🔊</button><button class="btn-record" id="rf1" onclick="record('f1', 'rf1')">🎤</button></div></div>
-        <div class="sub-box"><h4>Energy Saving</h4><p class="hint">It is / has / can...</p><textarea id="f2"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f2')">🔊</button><button class="btn-record" id="rf2" onclick="record('f2', 'rf2')">🎤</button></div></div>
-        <div class="sub-box"><h4>Browning Control</h4><p class="hint">It is / has / can...</p><textarea id="f3"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f3')">🔊</button><button class="btn-record" id="rf3" onclick="record('f3', 'rf3')">🎤</button></div></div>
-        <div class="sub-box"><h4>Automatic Shut-off</h4><p class="hint">It is / has / can...</p><textarea id="f4"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f4')">🔊</button><button class="btn-record" id="rf4" onclick="record('f4', 'rf4')">🎤</button></div></div>
-        <div class="sub-box"><h4>Toast Evenly</h4><p class="hint">It is / has / can...</p><textarea id="f5"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f5')">🔊</button><button class="btn-record" id="rf5" onclick="record('f5', 'rf5')">🎤</button></div></div>
-        <div class="sub-box"><h4>Remove Crumbs Easily</h4><p class="hint">It is / has / can...</p><textarea id="f6"></textarea><div class="btn-row"><button class="btn-listen" onclick="speak('f6')">🔊</button><button class="btn-record" id="rf6" onclick="record('f6', 'rf6')">🎤</button></div></div>
+        <div class="sub-box"><h4>Powerful</h4><p class="hint">It is / has / can...</p><textarea id="f1"></textarea><div class="btn-row"><button class="action btn-listen" onclick="speak('f1')">🔊</button><button class="action btn-record" id="rf1" onclick="record('f1', 'rf1')">🎤</button></div></div>
+        <div class="sub-box"><h4>Energy Saving</h4><p class="hint">It is / has / can...</p><textarea id="f2"></textarea><div class="btn-row"><button class="action btn-listen" onclick="speak('f2')">🔊</button><button class="action btn-record" id="rf2" onclick="record('f2', 'rf2')">🎤</button></div></div>
+        <div class="sub-box"><h4>Toast Browning Control</h4><p class="hint">It is / has / can...</p><textarea id="f3"></textarea><div class="btn-row"><button class="action btn-listen" onclick="speak('f3')">🔊</button><button class="action btn-record" id="rf3" onclick="record('f3', 'rf3')">🎤</button></div></div>
+        <div class="sub-box"><h4>Automatic Shut-off</h4><p class="hint">It is / has / can...</p><textarea id="f4"></textarea><div class="btn-row"><button class="action btn-listen" onclick="speak('f4')">🔊</button><button class="action btn-record" id="rf4" onclick="record('f4', 'rf4')">🎤</button></div></div>
+        <div class="sub-box"><h4>Toast Bread Evenly</h4><p class="hint">It is / has / can...</p><textarea id="f5"></textarea><div class="btn-row"><button class="action btn-listen" onclick="speak('f5')">🔊</button><button class="action btn-record" id="rf5" onclick="record('f5', 'rf5')">🎤</button></div></div>
+        <div class="sub-box"><h4>Remove Crumbs Easily</h4><p class="hint">It is / has / can...</p><textarea id="f6"></textarea><div class="btn-row"><button class="action btn-listen" onclick="speak('f6')">🔊</button><button class="action btn-record" id="rf6" onclick="record('f6', 'rf6')">🎤</button></div></div>
     </div>
 
     <div id="sec2" class="section-card">
         <div class="sub-box">
-            <h4>Ex 1: Standard Toasting</h4>
-            <p class="hint">Task: How to toast a slice of bread? (Use <b>slot</b> and <b>lever</b>)</p>
-            <textarea id="i1" placeholder="1. ... 2. ... -> ..."></textarea>
-            <div class="btn-row"><button class="btn-listen" onclick="speak('i1')">🔊 Listen</button><button class="btn-record" id="ri1" onclick="record('i1', 'ri1')">🎤 Practice</button></div>
+            <h4>How to toast bread?</h4>
+            <p class="hint">1. (Verb) [Slot] <br> 2. (Verb) [Lever] ➔ (Verb)</p>
+            <textarea id="i1" placeholder="1. Put bread into the slot..."></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('i1')">🔊</button><button class="action btn-record" id="ri1" onclick="record('i1', 'ri1')">🎤</button></div>
         </div>
         <div class="sub-box">
-            <h4>Ex 2: Stop / Cancel</h4>
-            <p class="hint">Task: How to stop the toaster early? (Use <b>lever</b>)</p>
-            <textarea id="i2" placeholder="1. ... 2. ... -> ..."></textarea>
-            <div class="btn-row"><button class="btn-listen" onclick="speak('i2')">🔊 Listen</button><button class="btn-record" id="ri2" onclick="record('i2', 'ri2')">🎤 Practice</button></div>
+            <h4>How to cancel toasting?</h4>
+            <p class="hint">1. (Verb) <br> 2. (Verb) [Lever] ➔ (Verb) [Slot]</p>
+            <textarea id="i2" placeholder="1. Press the eject button..."></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('i2')">🔊</button><button class="action btn-record" id="ri2" onclick="record('i2', 'ri2')">🎤</button></div>
         </div>
         <div class="sub-box">
-            <h4>Ex 3: Cleaning</h4>
-            <p class="hint">Task: How to clean the crumbs? (Mention <b>slot</b>)</p>
-            <textarea id="i3" placeholder="1. ... 2. ... -> ..."></textarea>
-            <div class="btn-row"><button class="btn-listen" onclick="speak('i3')">🔊 Listen</button><button class="btn-record" id="ri3" onclick="record('i3', 'ri3')">🎤 Practice</button></div>
+            <h4>How to adjust browning?</h4>
+            <p class="hint">1. (Verb) <br> 2. (Verb) [Lever] ➔ (Verb) [Slot]</p>
+            <textarea id="i3" placeholder="1. Turn the dial..."></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('i3')">🔊</button><button class="action btn-record" id="ri3" onclick="record('i3', 'ri3')">🎤</button></div>
         </div>
     </div>
 
     <div id="sec3" class="section-card">
         <div class="sub-box">
-            <h4>Your Final Review</h4>
+            <h4>Your Review</h4>
             <div class="suggestion-list">
-                <b>Suggestions:</b><br>
-                ❌ Don't like: takes up space, short cord, gets hot.<br>
-                ✅ Like: beautiful design, very fast, safe to use.
+                <b>Useful Expressions:</b><br>
+                ✨ I think...<br>
+                ✨ If you wonder my opinion, I would say...<br>
+                ✨ To me, ...<br>
+                ✨ It seems obvious that ...
             </div>
-            <p class="hint">Format: To me, this toaster is [Like]. But it is [Don't like].</p>
-            <textarea id="rv1" placeholder="To me, this toaster is... But it is..."></textarea>
-            <div class="btn-row">
-                <button class="btn-listen" onclick="speak('rv1')">🔊 Listen</button>
-                <button class="btn-record" id="rrv1" onclick="record('rv1', 'rrv1')">🎤 Practice</button>
+            <div class="suggestion-list" style="background: #eef2f7; border-color: #3498db;">
+                <b>What to write?</b><br>
+                ❌ Short cord / Gets hot / Heavy<br>
+                ✅ Fast / Sleek design / Safe
             </div>
+            <textarea id="rv1" placeholder="Start with your opinion, then add a 'But...'"></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('rv1')">🔊</button><button class="action btn-record" id="rrv1" onclick="record('rv1', 'rrv1')">🎤</button></div>
         </div>
     </div>
 
     <div id="sec4" class="section-card">
-        <div class="sub-box">
-            <h4>Option 1: Discount Code</h4>
-            <p class="hint">Topic: Use promo/discount code HOMEFOX, get 20% off</p>
-            <textarea id="c1" placeholder="e.g. If you want to save money, use the promo code HOMEFOX at checkout to get 20% off your total order!"></textarea>
-            <div class="btn-row"><button class="btn-listen" onclick="speak('c1')">🔊 Listen</button><button class="btn-record" id="rc1" onclick="record('c1', 'rc1')">🎤 Practice</button></div>
+        <div class="suggestion-list">
+            <b>Useful Expressions:</b><br>
+            🚀 Enter my promo code to get a ...<br>
+            🚀 (Do this), and you can get ...<br>
+            🚀 Would you like to get ...? (Do this)
         </div>
         <div class="sub-box">
-            <h4>Option 2: Seasonal Sale</h4>
-            <p class="hint">Topic: Festive sale deadline 15 June, up to 50% off</p>
-            <textarea id="c2" placeholder="e.g. Don't wait! The festive sale ends on 15 June. You can get a massive discount of up to 50% off if you act now!"></textarea>
-            <div class="btn-row"><button class="btn-listen" onclick="speak('c2')">🔊 Listen</button><button class="btn-record" id="rc2" onclick="record('c2', 'rc2')">🎤 Practice</button></div>
+            <h4>Topic 1: Promo Code</h4>
+            <p class="hint">Subject: Use promo code HOMEFOX for 20% off</p>
+            <textarea id="c1"></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('c1')">🔊</button><button class="action btn-record" id="rc1" onclick="record('c1', 'rc1')">🎤</button></div>
         </div>
         <div class="sub-box">
-            <h4>Option 3: Online Bonus</h4>
-            <p class="hint">Topic: Order it online, free giveaway</p>
-            <textarea id="c3" placeholder="e.g. Order your Rika toaster online today through our website and you will receive an exclusive free giveaway with your delivery!"></textarea>
-            <div class="btn-row"><button class="btn-listen" onclick="speak('c3')">🔊 Listen</button><button class="btn-record" id="rc3" onclick="record('c3', 'rc3')">🎤 Practice</button></div>
+            <h4>Topic 2: Seasonal Sale</h4>
+            <p class="hint">Subject: Festive sale deadline 15 June, up to 50% off</p>
+            <textarea id="c2"></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('c2')">🔊</button><button class="action btn-record" id="rc2" onclick="record('c2', 'rc2')">🎤</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>Topic 3: Online Order</h4>
+            <p class="hint">Subject: Order it online, free giveaway</p>
+            <textarea id="c3"></textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('c3')">🔊</button><button class="action btn-record" id="rc3" onclick="record('c3', 'rc3')">🎤</button></div>
+        </div>
+    </div>
+
+    <div id="sec5" class="section-card">
+        <div class="sub-box">
+            <h4>1. The Thank You</h4>
+            <textarea id="cl1">Thanks for watching!</textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('cl1')">🔊</button><button class="action btn-record" id="rcl1" onclick="record('cl1', 'rcl1')">🎤</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>2. The Channel Support</h4>
+            <textarea id="cl2">Don't forget to give a like, leave a comment and subscribe to my channel!</textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('cl2')">🔊</button><button class="action btn-record" id="rcl2" onclick="record('cl2', 'rcl2')">🎤</button></div>
+        </div>
+        <div class="sub-box">
+            <h4>3. The Sign-off</h4>
+            <textarea id="cl3">See you next time!</textarea>
+            <div class="btn-row"><button class="action btn-listen" onclick="speak('cl3')">🔊</button><button class="action btn-record" id="rcl3" onclick="record('cl3', 'rcl3')">🎤</button></div>
         </div>
     </div>
 </div>
@@ -155,16 +175,24 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('sec' + idx).classList.add('active');
         document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-        window.scrollTo(0,0);
     }
 
     function speak(id) {
         const text = document.getElementById(id).value;
-        if(!text) return alert("Please type your script first.");
+        if(!text) return;
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'en-US';
+        msg.rate = 0.9;
         window.speechSynthesis.speak(msg);
     }
+
+    const feedbacks = [
+        "🌟 Amazing! Your accent is like a pro YouTuber!",
+        "🔥 You're on fire! That was crystal clear.",
+        "💎 Spot on! Rika would be proud of you!",
+        "🌈 Brilliant! Keep that energy up!",
+        "🚀 To the moon! Your fluency is improving!"
+    ];
 
     function record(id, btnId) {
         const btn = document.getElementById(btnId);
@@ -172,13 +200,14 @@
         recognition.lang = 'en-US';
         
         btn.classList.add('recording');
-        btn.innerText = "🛑 Recording...";
+        btn.innerText = "Listening...👂";
         
         recognition.start();
 
         recognition.onresult = function(event) {
             const result = event.results[0][0].transcript;
-            alert("Feedback: \nYou said: " + result);
+            const randomFB = feedbacks[Math.floor(Math.random() * feedbacks.length)];
+            alert(randomFB + "\n\nYou said: " + result);
         };
 
         recognition.onend = function() {
